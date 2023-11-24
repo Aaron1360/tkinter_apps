@@ -4,7 +4,7 @@ import ttkbootstrap as ttk
 from ttkbootstrap.toast import ToastNotification
 from ttkbootstrap.constants import *
 
-app_icon="tkinter_apps/prices_calculator/python_dark.png"
+img = "prices_calculator/python.png" # <a href="https://www.flaticon.com/free-icons/python" title="python icons">Python icons created by Freepik - Flaticon</a>
 
 # MAIN CLASS
 class App(ttk.Window):
@@ -14,10 +14,10 @@ class App(ttk.Window):
         super().__init__(
             title = title,
             themename = theme,
-            iconphoto = app_icon,
+            iconphoto=img,
             minsize = (650,380),
             position = (400,200),
-            resizable=(TRUE,TRUE    ))
+            resizable=(TRUE,TRUE))
         
         # ADD CONTENT 
         self.main_frame = MainFrame(self)
@@ -110,4 +110,4 @@ class MainFrame(ttk.Frame):
         return widgets  
     
 # CREATE INSTANCE OF THE APP
-App("Calculadora GV", "darkly")
+App("Calculadora de precios", "darkly")
