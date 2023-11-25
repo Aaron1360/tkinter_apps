@@ -4,7 +4,7 @@ import ttkbootstrap as ttk
 from ttkbootstrap.toast import ToastNotification
 from ttkbootstrap.constants import *
 
-img = "prices_calculator/python.png" # <a href="https://www.flaticon.com/free-icons/python" title="python icons">Python icons created by Freepik - Flaticon</a>
+img = "price_calculator/python.png" # https://www.flaticon.com/free-icons/python icon created by Freepik
 
 # MAIN CLASS
 class App(ttk.Window):
