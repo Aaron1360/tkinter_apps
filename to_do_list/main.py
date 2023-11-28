@@ -1,7 +1,6 @@
 from tkinter import PhotoImage
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
-from ttkbootstrap.icons import Icon
 
 app_icon = "to_do_list/python-file.png"# https://www.flaticon.com/free-icons/python-file  icon created by The Chohans
 
@@ -15,6 +14,10 @@ class App(ttk.Window):
             position = (500,150),
             resizable=(FALSE,FALSE)
         )
+        # pencil = PhotoImage(file="to_do_list/pencil.png")
+        # self.pencil_icon=pencil.subsample(23,23)
+        trash = PhotoImage(file="to_do_list/trash.png")# https://www.flaticon.com/free-icon/trash_12805786?term=trash&page=3&position=5&origin=search&related_id=12805786
+        self.trash_icon=trash.subsample(23,23)
         
         self.main_frame = MainFrame(self)
         
@@ -26,7 +29,7 @@ class MainFrame(ttk.Frame):
         self.pack(side=TOP,fill=BOTH,expand=TRUE)
         
         ttk.Label(master=self,name="title",text="Enter new task",anchor="center",font=("helvetica",14)).pack(side=TOP,fill=X)
-        
+        self.tasks_list = []
         self.addInputBar()
         self.addMenuFrame()
         self.addContentFrame()
@@ -34,10 +37,12 @@ class MainFrame(ttk.Frame):
     def addInputBar(self):
         inputFrame = ttk.Frame(master=self,padding=10)
         inputFrame.pack(side=TOP)
-        
-        ttk.Entry(master=inputFrame,name="newTask",width=40).pack(side=LEFT,anchor=N)
+        self.text=ttk.StringVar()
+        self.usrEntry = ttk.Entry(master=inputFrame,name="newTask",width=40,textvariable=self.text)
+        self.usrEntry.pack(side=LEFT,anchor=N)
         inputFrame.nametowidget("newTask").focus_set()
-        ttk.Button(master=inputFrame,name="newTaskBtn",text="+").pack(side=LEFT,anchor=N)
+        self.addBtn = ttk.Button(master=inputFrame,name="newTaskBtn",text="+",command=self.addNewTask)
+        self.addBtn.pack(side=LEFT,anchor=N,padx=5)
         
     def addMenuFrame(self):
         MenuFrame = ttk.Frame(master=self,padding=10)
@@ -49,29 +54,61 @@ class MainFrame(ttk.Frame):
             ttk.Button(master=MenuFrame,name=label.lower(),text=label,padding=10).pack(side=LEFT,padx=10)
         
     def addContentFrame(self):
-        contentFrame = ttk.Frame(master=self)
-        contentFrame.pack(side=TOP,fill=BOTH)
+        self.contentFrame = ttk.Frame(master=self)
+        self.contentFrame.pack(side=TOP,fill=BOTH)
         
-        statusFrame = ttk.Frame(master=contentFrame)
-        statusFrame.pack(side=BOTTOM,fill=X)
+        self.statusFrame = ttk.Frame(master=self.contentFrame)
+        self.statusFrame.pack(side=BOTTOM,fill=X)
         
-        itemsLabel = ttk.Label(master=statusFrame,text="active item(s) left")
-        itemsLabel.pack(side=LEFT,fill=X,expand=TRUE,anchor=E)
-        clearButton = ttk.Button(master=statusFrame,text="Clear Completed")
+        self.count = ttk.IntVar(value=0)
+        self.itemsLabel = ttk.Label(master=self.statusFrame,text=f"{self.count.get()} active item(s) left")
+        self.itemsLabel.pack(side=LEFT,fill=X,expand=TRUE,anchor=E)
+        clearButton = ttk.Button(master=self.statusFrame,text="Clear Completed",command=self.clearCompletedTasks)
         clearButton.pack(side=LEFT,fill=X)
         
-        newTask=Task(contentFrame,"some boring task")
-        newTask.pack(side=TOP)
+    def updateLabel(self,operation):
+        if operation == "add":
+            self.count.set(self.count.get() + 1)
+        elif operation == "sub":
+            self.count.set(self.count.get() - 1)
+        self.itemsLabel.config(text=f"{self.count.get()} active item(s) left")
+    
+    def addNewTask(self):
+        if self.text.get()!="":
+            newTask=Task(self.contentFrame,self.master,self.text.get())
+            newTask.pack(side=TOP,anchor=NW,pady=3)
+            self.tasks_list.append(newTask)
+            self.updateLabel("add")
+            
+    def clearCompletedTasks(self):
+        new_list=[]
+        for t in self.tasks_list:
+            if t.checkvar.get() == 1:
+                t.deleteTask(update=FALSE)
+                self.updateLabel("sub")
+            else:
+                new_list.append(t)
+        self.tasks_list = new_list
         
 class Task(ttk.Frame):
-    def __init__(self,parent,task):
-        pencil_icon = PhotoImage(file="to_do_list/pencil.png") # https://www.flaticon.com/free-icons/pencil created by Mayor Icons
-        trash_icon = "to_do_list/trash-can.png" # https://www.flaticon.com/free-icons/trash created by Freepik 
+    def __init__(self,parent,mainWindow,task):
         super().__init__(parent)
-        ttk.Checkbutton(master=self).pack(side=LEFT)
-        ttk.Label(master=self,text=task).pack(side=LEFT,fill=X,expand=TRUE)
-        ttk.Button(master=self,image=pencil_icon).pack(side=LEFT)
-        ttk.Button(master=self).pack(side=LEFT)
+        self.mainWindow=mainWindow
+        self.checkvar = ttk.IntVar(value=0)
+        ttk.Checkbutton(master=self,variable=self.checkvar).pack(side=LEFT)
+        self.label=ttk.Label(master=self,text=task,width=40)
+        self.label.pack(side=LEFT,fill=X,expand=TRUE)
+        # ttk.Button(master=self,image=self.mainWindow.pencil_icon,style='Outline.TButton').pack(side=LEFT,padx=5)
+        ttk.Button(master=self,image=self.mainWindow.trash_icon,style='Outline.TButton',command=lambda : self.deleteTask(update=TRUE)).pack(side=LEFT)
+
+    def deleteTask(self,update):
+        self.destroy()
+        if update == TRUE:
+            MainFrame.updateLabel(self.mainWindow.main_frame,"sub")
+    
+    def showText(self):
+        print(self.label.cget("text"))
         
-App("To-Do List","journal",(450,600))
-# help(ttk.Window) 
+# help(ttk.Label)
+
+App("To-Do List","journal",(450,600)) 
