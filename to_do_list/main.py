@@ -2,7 +2,7 @@ from tkinter import PhotoImage
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 
-app_icon = "to_do_list/python-file.png"# https://www.flaticon.com/free-icons/python-file  icon created by The Chohans
+app_icon = "to_do_list/icons/window.png"
 
 class App(ttk.Window):
     def __init__(self,title,theme,size):
@@ -14,9 +14,7 @@ class App(ttk.Window):
             position = (500,150),
             resizable=(FALSE,FALSE)
         )
-        # pencil = PhotoImage(file="to_do_list/pencil.png")
-        # self.pencil_icon=pencil.subsample(23,23)
-        trash = PhotoImage(file="to_do_list/trash.png")# https://www.flaticon.com/free-icon/trash_12805786?term=trash&page=3&position=5&origin=search&related_id=12805786
+        trash = PhotoImage(file="to_do_list/icons/trash-can.png")
         self.trash_icon=trash.subsample(23,23)
         
         self.main_frame = MainFrame(self)
@@ -81,6 +79,7 @@ class MainFrame(ttk.Frame):
             self.updateLabel("add")
             
     def clearCompletedTasks(self):
+        # 
         new_list=[]
         for t in self.tasks_list:
             if t.checkvar.get() == 1:
@@ -90,6 +89,9 @@ class MainFrame(ttk.Frame):
                 new_list.append(t)
         self.tasks_list = new_list
         
+    def testfunction(self):
+        pass
+    
 class Task(ttk.Frame):
     def __init__(self,parent,mainWindow,task):
         super().__init__(parent)
@@ -98,7 +100,6 @@ class Task(ttk.Frame):
         ttk.Checkbutton(master=self,variable=self.checkvar).pack(side=LEFT)
         self.label=ttk.Label(master=self,text=task,width=40)
         self.label.pack(side=LEFT,fill=X,expand=TRUE)
-        # ttk.Button(master=self,image=self.mainWindow.pencil_icon,style='Outline.TButton').pack(side=LEFT,padx=5)
         ttk.Button(master=self,image=self.mainWindow.trash_icon,style='Outline.TButton',command=lambda : self.deleteTask(update=TRUE)).pack(side=LEFT)
 
     def deleteTask(self,update):
@@ -107,8 +108,10 @@ class Task(ttk.Frame):
             MainFrame.updateLabel(self.mainWindow.main_frame,"sub")
     
     def showText(self):
+
         print(self.label.cget("text"))
-        
-# help(ttk.Label)
 
 App("To-Do List","journal",(450,600)) 
+
+# TODO: make another file and put the design in it, leave the functionality apart.
+#       store the current notes and load them 
